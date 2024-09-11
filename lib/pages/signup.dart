@@ -17,7 +17,7 @@ class _SignUpPageState extends State<SignUpPage> {
   void _validateAndSubmit() {
     if (_formKey.currentState?.validate() ?? false) {
       // Perform sign up logic here
-      Navigator.pushReplacementNamed(context, '/home');
+      Navigator.pushNamed(context, '/sorting');
     }
   }
 

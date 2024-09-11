@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sdp/pages/home.dart';
 import 'package:sdp/pages/signup.dart';
-
+import 'package:sdp/pages/sorting.dart';
 void main() {
   runApp(MyApp());
 }
@@ -16,6 +16,7 @@ class MyApp extends StatelessWidget {
         '/login': (context) => LoginPage(),
         '/home': (context) => HomePage(),
         '/signup': (context) => SignUpPage(),
+        '/sorting': (context) => SortingPage(),
       },
       home:LoginPage(),
       // Add an onGenerateRoute for unknown routes
@@ -116,7 +117,7 @@ class _LoginPageState extends State<LoginPage> {
             // Login Button
             ElevatedButton(
               onPressed: () {
-                Navigator.pushNamed(context, '/home');
+                Navigator.pushNamed(context, '/sorting');
               },
               child: Text(
                 'Login',
