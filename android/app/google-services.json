@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "840616857548",
+    "project_id": "algo-38d11",
+    "storage_bucket": "algo-38d11.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:840616857548:android:0be13e97e8cf621692d769",
+        "android_client_info": {
+          "package_name": "com.example.sdp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAXBOgNeYXwtEf0r_0sYHU66_tfWur5vks"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
