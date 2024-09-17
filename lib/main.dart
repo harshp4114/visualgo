@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:sdp/pages/home.dart';
 import 'package:sdp/pages/signup.dart';
 import 'package:sdp/pages/sorting.dart';
-void main() {
+import 'package:firebase_core/firebase_core.dart';
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(MyApp());
 }
 
@@ -11,7 +14,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      initialRoute: '/login',
+      initialRoute: '/home',
       routes: {
         '/login': (context) => LoginPage(),
         '/home': (context) => HomePage(),

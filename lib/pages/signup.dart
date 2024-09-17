@@ -1,5 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:sdp/firebase_auth/auth_services.dart';
 import 'package:sdp/main.dart';
+import 'package:sdp/firebase_auth/auth_services.dart';
+import 'package:firebase_core/firebase_core.dart';
+
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
 
@@ -8,6 +13,9 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpPageState extends State<SignUpPage> {
+
+  FirebaseAuthService _auth=FirebaseAuthService();
+
   final _usernameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -184,7 +192,10 @@ class _SignUpPageState extends State<SignUpPage> {
 
               // Sign Up Button
               ElevatedButton(
-                onPressed: _validateAndSubmit,
+                onPressed: (){
+                  _validateAndSubmit();
+                  _signUp();
+                },
                 child: Text(
                   'Sign Up',
                   style: TextStyle(
@@ -236,5 +247,21 @@ class _SignUpPageState extends State<SignUpPage> {
         ),
       ),
     );
+  }
+
+  void _signUp() async{
+    String username=_usernameController.text;
+    String email=_emailController.text;
+    String password=_passwordController.text;
+
+    User? user= await _auth.signUpWithEmailAndPassword(email, password);
+
+    if(user!=null){
+      print("user created successfully.");
+      Navigator.pushNamed(context, '/home');
+    }else{
+      print("something happend");
+    }
+
   }
 }
