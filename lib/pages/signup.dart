@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:sdp/firebase_auth/auth_services.dart';
 import 'package:sdp/main.dart';
+import 'package:sdp/pages/login.dart';
 import 'package:sdp/firebase_auth/auth_services.dart';
 import 'package:firebase_core/firebase_core.dart';
 
@@ -22,12 +23,7 @@ class _SignUpPageState extends State<SignUpPage> {
   final _confirmPasswordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
-  void _validateAndSubmit() {
-    if (_formKey.currentState?.validate() ?? false) {
-      // Perform sign up logic here
-      Navigator.pushNamed(context, '/sorting');
-    }
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -193,7 +189,6 @@ class _SignUpPageState extends State<SignUpPage> {
               // Sign Up Button
               ElevatedButton(
                 onPressed: (){
-                  _validateAndSubmit();
                   _signUp();
                 },
                 child: Text(
@@ -250,18 +245,22 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   void _signUp() async{
-    String username=_usernameController.text;
-    String email=_emailController.text;
-    String password=_passwordController.text;
+    if (_formKey.currentState?.validate() ?? false) {
+      String username=_usernameController.text;
+      String email=_emailController.text;
+      String password=_passwordController.text;
 
-    User? user= await _auth.signUpWithEmailAndPassword(email, password);
+      User? user= await _auth.signUpWithEmailAndPassword(email, password);
 
-    if(user!=null){
-      print("user created successfully.");
-      Navigator.pushNamed(context, '/home');
-    }else{
-      print("something happend");
+      if(user!=null){
+        print("user created successfully.");
+        Navigator.pushNamed(context, '/home');
+      }else{
+        print("something happend");
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('SignUp failed. Please try again.')),
+        );
     }
-
+  }
   }
 }
