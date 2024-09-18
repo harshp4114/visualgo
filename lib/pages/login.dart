@@ -79,6 +79,10 @@ class _LoginPageState extends State<LoginPage> {
                       color: Colors.indigo[600]!,
                       fontSize: 25,
                       fontWeight: FontWeight.w600),
+                  errorStyle: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w600,
+                  ),
                   hintText: 'Enter your email',
                   hintStyle: TextStyle(color: Colors.indigo[300]!),
                 ),
@@ -112,6 +116,10 @@ class _LoginPageState extends State<LoginPage> {
                       color: Colors.indigo[600]!,
                       fontSize: 25,
                       fontWeight: FontWeight.w600),
+                  errorStyle: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w600,
+                  ),
                   hintText: 'Enter your password',
                   hintStyle: TextStyle(color: Colors.indigo[300]!),
                 ),
