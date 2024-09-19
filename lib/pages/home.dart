@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:sdp/pages/signup.dart';
 import 'package:sdp/pages/login.dart';
-import 'package:sdp/pages/sorting.dart'; // Import the BubbleSortPage
+import 'package:sdp/sorting/bubble.dart'; // Import the BubbleSortPage
 
 class HomePage extends StatefulWidget {
   @override

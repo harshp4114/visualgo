@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'bar.dart'; // Ensure you have the Bar widget properly defined
+import '../pages/bar.dart'; // Ensure you have the Bar widget properly defined
 
 class SortingPage extends StatefulWidget {
   @override

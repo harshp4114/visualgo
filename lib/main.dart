@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sdp/pages/home.dart';
 import 'package:sdp/pages/signup.dart';
-import 'package:sdp/pages/sorting.dart';
+import 'package:sdp/sorting/bubble.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:sdp/pages/login.dart';
 
