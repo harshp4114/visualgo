@@ -1,8 +1,11 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:sdp/pages/signup.dart';
 import 'package:sdp/pages/login.dart';
 import 'package:sdp/sorting/bubble.dart'; // Import the BubbleSortPage
+import 'package:sdp/sorting/insertion.dart'; // Import the InsertionSortPage
+import 'package:sdp/sorting/selection.dart'; // Import the SelectionSortPage
+import 'package:sdp/sorting/merge.dart'; // Import the MergeSortPage
 
 class HomePage extends StatefulWidget {
   @override
@@ -55,7 +58,7 @@ class _HomePageState extends State<HomePage> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => SortingPage()),
+                  MaterialPageRoute(builder: (context) => SortingPage()), // Navigate to Bubble Sort Page
                 );
               },
               style: ElevatedButton.styleFrom(
@@ -67,6 +70,87 @@ class _HomePageState extends State<HomePage> {
               ),
               child: Text(
                 "Bubble Sort",
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Montserrat',
+                  color: Colors.white,
+                ),
+              ),
+            ),
+            SizedBox(height: 40),
+
+            // Insertion Sort Button
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => InsertionSortPage()), // Navigate to Insertion Sort Page
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.indigo[600],  // Medium blue button
+                padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              child: Text(
+                "Insertion Sort",
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Montserrat',
+                  color: Colors.white,
+                ),
+              ),
+            ),
+            SizedBox(height: 40),
+
+            // Selection Sort Button
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => SelectionSortPage()), // Navigate to Selection Sort Page
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.indigo[600],  // Medium blue button
+                padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              child: Text(
+                "Selection Sort",
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Montserrat',
+                  color: Colors.white,
+                ),
+              ),
+            ),
+            SizedBox(height: 40),
+
+            // Merge Sort Button
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => MergeSortPage()), // Navigate to Merge Sort Page
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.indigo[600],  // Medium blue button
+                padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              child: Text(
+                "Merge Sort",
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -110,7 +194,7 @@ class _HomePageState extends State<HomePage> {
     FirebaseAuth.instance.signOut();
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (context) => LoginPage()), // Navigating to LoginPage
+      MaterialPageRoute(builder: (context) => LoginPage()), // Navigate to LoginPage
       ModalRoute.withName('/login'),
     );
   }

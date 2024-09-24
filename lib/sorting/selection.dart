@@ -1,36 +1,50 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import '../widgets/bar.dart'; // Ensure you have the Bar widget properly defined
+import '../widgets/bar.dart'; // Ensure your Bar widget is imported correctly
 
-class SortingPage extends StatefulWidget {
+class SelectionSortPage extends StatefulWidget {
   @override
-  _SortingPageState createState() => _SortingPageState();
+  _SelectionSortPageState createState() => _SelectionSortPageState();
 }
 
-class _SortingPageState extends State<SortingPage> {
+class _SelectionSortPageState extends State<SelectionSortPage> {
   List<int> _array = [];
   List<List<int>> _steps = [];
-  List<List<int>> _swapIndices = [];  // Track indices of swapped elements
   bool _isSorting = false;
   int _currentStep = 0;
+  int _minIndex = -1; // Track the index of the minimum value
 
   final _arrayController = TextEditingController();
 
-  // Bubble sort implementation with steps tracking and swap highlighting
-  void _bubbleSort() {
+  // Selection sort implementation with steps tracking
+  void _selectionSort() {
     List<int> arr = List.from(_array);
     for (int i = 0; i < arr.length - 1; i++) {
-      for (int j = 0; j < arr.length - i - 1; j++) {
-        if (arr[j] > arr[j + 1]) {
-          int temp = arr[j];
-          arr[j] = arr[j + 1];
-          arr[j + 1] = temp;
+      int minIndex = i; // Start with the first element as the minimum
 
-          // Add the current state of the array and the swapped indices
-          _steps.add(List.from(arr));
-          _swapIndices.add([j, j + 1]);  // Track which bars were swapped
+      // Save the current state at the beginning of each outer loop iteration
+      _steps.add(List.from(arr));
+
+      for (int j = i + 1; j < arr.length; j++) {
+        if (arr[j] < arr[minIndex]) {
+          minIndex = j; // Update the minimum index
         }
+        // Save the current state after checking
+        _steps.add(List.from(arr));
       }
+
+      // Highlight the minimum index after the inner loop
+      _minIndex = minIndex;
+
+      // Swap if the minimum index is not the current index
+      if (minIndex != i) {
+        int temp = arr[i];
+        arr[i] = arr[minIndex];
+        arr[minIndex] = temp;
+      }
+
+      // Save the state after the swap
+      _steps.add(List.from(arr));
     }
   }
 
@@ -40,8 +54,8 @@ class _SortingPageState extends State<SortingPage> {
     setState(() {
       _array = array;
       _steps = [List.from(array)];
-      _swapIndices = [[-1, -1]];  // No swaps initially
       _currentStep = 0;
+      _minIndex = -1; // Reset min index
     });
   }
 
@@ -50,13 +64,12 @@ class _SortingPageState extends State<SortingPage> {
     setState(() {
       _isSorting = true;
       _steps = [];
-      _swapIndices = [];
     });
 
     // First, generate the steps by sorting the array
-    _bubbleSort();
+    _selectionSort();
 
-    // Now, animate the sorting process
+    // Animate the sorting process
     for (int i = 0; i < _steps.length; i++) {
       await Future.delayed(Duration(milliseconds: 500));
       setState(() {
@@ -76,7 +89,7 @@ class _SortingPageState extends State<SortingPage> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Bubble Sort Visualization'),
+          title: Text('Selection Sort Visualization'),
           backgroundColor: Colors.indigo,
         ),
         body: Padding(
@@ -98,14 +111,12 @@ class _SortingPageState extends State<SortingPage> {
               ),
               SizedBox(height: 20),
 
-              // Scrollable section for the Bubble Sort code
+              // Display the Selection Sort code
               Text(
-                'Bubble Sort Code:',
+                'Selection Sort Code:',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 10),
-
-              // Making the code scrollable with a limited height
               Container(
                 height: 120, // Set fixed height for scrollable code area
                 child: SingleChildScrollView(
@@ -115,16 +126,18 @@ class _SortingPageState extends State<SortingPage> {
                     child: Text(
                       '''
 for (int i = 0; i < arr.length - 1; i++) {
-  for (int j = 0; j < arr.length - i - 1; j++) {
-    if (arr[j] > arr[j + 1]) {
-      int temp = arr[j];
-      arr[j] = arr[j + 1];
-      arr[j + 1] = temp;
+  int minIndex = i;
+  for (int j = i + 1; j < arr.length; j++) {
+    if (arr[j] < arr[minIndex]) {
+      minIndex = j;
     }
   }
+  int temp = arr[i];
+  arr[i] = arr[minIndex];
+  arr[minIndex] = temp;
 }
                       ''',
-                      style: TextStyle(fontSize: 16, fontFamily: 'Courier'),
+                      style: TextStyle(fontFamily: 'Courier'),
                     ),
                   ),
                 ),
@@ -146,16 +159,12 @@ for (int i = 0; i < arr.length - 1; i++) {
                       ? _steps[_currentStep].asMap().entries.map((entry) {
                     int index = entry.key;
                     int value = entry.value;
-
-                    // Highlight the bars that are being swapped
-                    Color barColor = _swapIndices[_currentStep].contains(index)
-                        ? Colors.red  // Color for the swapped bars
-                        : Colors.blue;
-
+                    // Highlight the current minimum index
+                    bool isMin = index == _minIndex;
                     return Bar(
                       value: value,
                       maxValue: maxValue,
-                      color: barColor,
+                      color: isMin ? Colors.red : Colors.blue, // Highlight min index in red
                     );
                   }).toList()
                       : [],
@@ -167,7 +176,7 @@ for (int i = 0; i < arr.length - 1; i++) {
               // Sorting Control Buttons
               Center(
                 child: ElevatedButton(
-                  onPressed: _isSorting ? null : _startSortingVisualization,
+                  onPressed: _isSorting ? null : _startSortingVisualization, // Disable button during sorting
                   child: Text('Start Sorting Animation'),
                 ),
               ),

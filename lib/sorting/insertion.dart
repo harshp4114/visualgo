@@ -1,36 +1,46 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import '../widgets/bar.dart'; // Ensure you have the Bar widget properly defined
+import '../widgets/bar.dart'; // Ensure your Bar widget is imported correctly
 
-class SortingPage extends StatefulWidget {
+class InsertionSortPage extends StatefulWidget {
   @override
-  _SortingPageState createState() => _SortingPageState();
+  _InsertionSortPageState createState() => _InsertionSortPageState();
 }
 
-class _SortingPageState extends State<SortingPage> {
+class _InsertionSortPageState extends State<InsertionSortPage> {
   List<int> _array = [];
   List<List<int>> _steps = [];
-  List<List<int>> _swapIndices = [];  // Track indices of swapped elements
   bool _isSorting = false;
   int _currentStep = 0;
+  int _keyIndex = -1; // Track the index of the key being compared
 
   final _arrayController = TextEditingController();
 
-  // Bubble sort implementation with steps tracking and swap highlighting
-  void _bubbleSort() {
-    List<int> arr = List.from(_array);
-    for (int i = 0; i < arr.length - 1; i++) {
-      for (int j = 0; j < arr.length - i - 1; j++) {
-        if (arr[j] > arr[j + 1]) {
-          int temp = arr[j];
-          arr[j] = arr[j + 1];
-          arr[j + 1] = temp;
+  // Define a list of colors for the key
+  final List<Color> _keyColors = [Colors.red, Colors.green, Colors.yellow, Colors.orange];
 
-          // Add the current state of the array and the swapped indices
-          _steps.add(List.from(arr));
-          _swapIndices.add([j, j + 1]);  // Track which bars were swapped
-        }
+  // Insertion sort implementation with steps tracking
+  void _insertionSort() {
+    List<int> arr = List.from(_array);
+    for (int i = 1; i < arr.length; i++) {
+      int key = arr[i];
+      int j = i - 1;
+
+      // Highlight the current key and save the state
+      _keyIndex = i; // Set the key index
+      _steps.add(List.from(arr)); // Save the state before placing the key
+
+      while (j >= 0 && arr[j] > key) {
+        arr[j + 1] = arr[j];
+        j--;
+
+        // Add the state after each element movement
+        _steps.add(List.from(arr));
       }
+      arr[j + 1] = key;
+
+      // Save the state after placing the key
+      _steps.add(List.from(arr));
     }
   }
 
@@ -40,8 +50,8 @@ class _SortingPageState extends State<SortingPage> {
     setState(() {
       _array = array;
       _steps = [List.from(array)];
-      _swapIndices = [[-1, -1]];  // No swaps initially
       _currentStep = 0;
+      _keyIndex = -1; // Reset key index
     });
   }
 
@@ -50,22 +60,24 @@ class _SortingPageState extends State<SortingPage> {
     setState(() {
       _isSorting = true;
       _steps = [];
-      _swapIndices = [];
     });
 
     // First, generate the steps by sorting the array
-    _bubbleSort();
+    _insertionSort();
 
-    // Now, animate the sorting process
+    // Animate the sorting process
     for (int i = 0; i < _steps.length; i++) {
       await Future.delayed(Duration(milliseconds: 500));
       setState(() {
         _currentStep = i;
+        // Update the key index to match the current step
+        _keyIndex = (i % _array.length < _array.length) ? i % _array.length : -1; // Reset if out of bounds
       });
     }
 
     setState(() {
       _isSorting = false;
+      _keyIndex = -1; // Reset key index after sorting is done
     });
   }
 
@@ -76,7 +88,7 @@ class _SortingPageState extends State<SortingPage> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Bubble Sort Visualization'),
+          title: Text('Insertion Sort Visualization'),
           backgroundColor: Colors.indigo,
         ),
         body: Padding(
@@ -98,14 +110,12 @@ class _SortingPageState extends State<SortingPage> {
               ),
               SizedBox(height: 20),
 
-              // Scrollable section for the Bubble Sort code
+              // Display the Insertion Sort code
               Text(
-                'Bubble Sort Code:',
+                'Insertion Sort Code:',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 10),
-
-              // Making the code scrollable with a limited height
               Container(
                 height: 120, // Set fixed height for scrollable code area
                 child: SingleChildScrollView(
@@ -114,17 +124,17 @@ class _SortingPageState extends State<SortingPage> {
                     color: Colors.grey[200],
                     child: Text(
                       '''
-for (int i = 0; i < arr.length - 1; i++) {
-  for (int j = 0; j < arr.length - i - 1; j++) {
-    if (arr[j] > arr[j + 1]) {
-      int temp = arr[j];
-      arr[j] = arr[j + 1];
-      arr[j + 1] = temp;
-    }
+for (int i = 1; i < arr.length; i++) {
+  int key = arr[i];
+  int j = i - 1;
+  while (j >= 0 && arr[j] > key) {
+    arr[j + 1] = arr[j];
+    j--;
   }
+  arr[j + 1] = key;
 }
                       ''',
-                      style: TextStyle(fontSize: 16, fontFamily: 'Courier'),
+                      style: TextStyle(fontFamily: 'Courier'),
                     ),
                   ),
                 ),
@@ -147,15 +157,13 @@ for (int i = 0; i < arr.length - 1; i++) {
                     int index = entry.key;
                     int value = entry.value;
 
-                    // Highlight the bars that are being swapped
-                    Color barColor = _swapIndices[_currentStep].contains(index)
-                        ? Colors.red  // Color for the swapped bars
-                        : Colors.blue;
+                    // Determine color for the key based on current step
+                    Color color = index == _keyIndex ? Colors.red : Colors.blue;
 
                     return Bar(
                       value: value,
                       maxValue: maxValue,
-                      color: barColor,
+                      color: color, // Use the determined color
                     );
                   }).toList()
                       : [],
@@ -167,7 +175,7 @@ for (int i = 0; i < arr.length - 1; i++) {
               // Sorting Control Buttons
               Center(
                 child: ElevatedButton(
-                  onPressed: _isSorting ? null : _startSortingVisualization,
+                  onPressed: _isSorting ? null : _startSortingVisualization, // Disable button during sorting
                   child: Text('Start Sorting Animation'),
                 ),
               ),
