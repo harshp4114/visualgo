@@ -31,6 +31,7 @@ class _LoginPageState extends State<LoginPage> {
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 28,
+            color: Colors.white,
             fontFamily: 'Montserrat',
           ),
         ),
@@ -40,6 +41,7 @@ class _LoginPageState extends State<LoginPage> {
       backgroundColor: Colors.lightBlue[50]!,
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(horizontal: 20, vertical: 30),
+        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag, // Dismiss keyboard when scrolling
         child: Form(
           key: _formKey, // Form key for validation
           child: Column(
@@ -160,9 +162,9 @@ class _LoginPageState extends State<LoginPage> {
               ),
               SizedBox(height: 50),
 
-              // Text and Sign Up Button Row
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+              // Text and Sign Up Button below
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Text(
                     "Create an account?",
@@ -173,7 +175,7 @@ class _LoginPageState extends State<LoginPage> {
                       fontFamily: 'Montserrat',
                     ),
                   ),
-                  SizedBox(width: 15),
+                  SizedBox(height: 10), // Add some space between the text and the button
 
                   // Sign Up Button
                   ElevatedButton(

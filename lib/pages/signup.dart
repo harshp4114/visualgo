@@ -36,6 +36,7 @@ class _SignUpPageState extends State<SignUpPage> {
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 28,
+            color: Colors.white,
             fontFamily: 'Montserrat',
           ),
         ),
@@ -255,7 +256,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
       if(user!=null){
         print("user created successfully.");
-        Navigator.pushNamed(context, '/home');
+        Navigator.pushReplacementNamed(context, '/home');
       }else{
         print("something happend");
         ScaffoldMessenger.of(context).showSnackBar(

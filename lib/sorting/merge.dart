@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import '../widgets/merge_sort_tree.dart'; // Ensure this is imported
-import '../pages/home.dart';
-import '../pages/signup.dart';
 
 class MergeSortPage extends StatefulWidget {
   @override
@@ -9,130 +6,224 @@ class MergeSortPage extends StatefulWidget {
 }
 
 class _MergeSortPageState extends State<MergeSortPage> {
-  List<int> _array = [];
-  List<List<int>> _steps = [];
-  bool _isSorting = false;
-  int _currentStep = 0;
+  List<int> array = [];
+  List<List<int>> steps = []; // To hold steps for visualization
+  int currentStep = -1;
+  final TextEditingController arrayController = TextEditingController();
 
-  final _arrayController = TextEditingController();
-
-  void _mergeSort(List<int> arr) {
-    if (arr.length <= 1) return; // Base case
-
-    int mid = arr.length ~/ 2; // Find the midpoint
-    List<int> left = arr.sublist(0, mid);
-    List<int> right = arr.sublist(mid);
-
-    _mergeSort(left); // Sort the left half
-    _mergeSort(right); // Sort the right half
-
-    _merge(arr, left, right); // Merge the sorted halves
+  @override
+  void dispose() {
+    arrayController.dispose();
+    super.dispose();
   }
 
-  void _merge(List<int> arr, List<int> left, List<int> right) {
-    int i = 0, j = 0, k = 0;
-    List<int> merged = [];
+  // Merge Sort Algorithm with step recording
+  void mergeSort(List<int> array) {
+    if (array.length <= 1) return;
 
+    int mid = array.length ~/ 2;
+    List<int> left = array.sublist(0, mid);
+    List<int> right = array.sublist(mid);
+
+    mergeSort(left);
+    mergeSort(right);
+
+    int i = 0, j = 0, k = 0;
     while (i < left.length && j < right.length) {
       if (left[i] <= right[j]) {
-        merged.add(left[i++]);
+        array[k++] = left[i++];
       } else {
-        merged.add(right[j++]);
+        array[k++] = right[j++];
       }
     }
 
-    while (i < left.length) {
-      merged.add(left[i++]);
-    }
+    while (i < left.length) array[k++] = left[i++];
+    while (j < right.length) array[k++] = right[j++];
 
-    while (j < right.length) {
-      merged.add(right[j++]);
-    }
-
-    for (int value in merged) {
-      arr[k++] = value;
-    }
-
-    _steps.add(List.from(arr)); // Save the current state of the array
+    steps.add(List.from(array)); // Store the array at each step
   }
 
-  void _parseArrayInput(String input) {
-    List<int> array = input.split(',').map((e) => int.tryParse(e.trim()) ?? 0).toList();
+  // Function to start the merge sort and reset steps
+  void startMergeSort() {
     setState(() {
-      _array = array;
-      _steps = [List.from(array)];
-      _currentStep = 0;
+      array = arrayController.text.split(",").map((e) => int.parse(e.trim())).toList();
+      steps.clear();
+      mergeSort(array);
+      currentStep = 0;
     });
   }
 
-  Future<void> _startSortingVisualization() async {
+  // Move to the next step in the visualization
+  void nextStep() {
     setState(() {
-      _isSorting = true;
-      _steps = []; // Reset steps
+      if (currentStep < steps.length - 1) {
+        currentStep++;
+      }
     });
+  }
 
-    _mergeSort(_array);
+  // Move to the previous step in the visualization
+  void previousStep() {
+    setState(() {
+      if (currentStep > 0) {
+        currentStep--;
+      }
+    });
+  }
 
-    // Update the current step based on the steps generated during sorting
-    for (int i = 0; i < _steps.length; i++) {
-      await Future.delayed(Duration(seconds: 1)); // Delay for visualization
-      setState(() {
-        _currentStep = i;
-      });
+  // Widget to build the tree-like hierarchy view
+  Widget _buildTree(List<int> array, int level) {
+    if (array.length == 1) {
+      return Container(
+        margin: EdgeInsets.all(8),
+        width: 50,
+        height: 50,
+        decoration: BoxDecoration(
+          color: Colors.blue,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Center(
+          child: Text(
+            array[0].toString(),
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
+          ),
+        ),
+      );
     }
 
-    setState(() {
-      _isSorting = false;
-    });
+    int mid = array.length ~/ 2;
+    List<int> left = array.sublist(0, mid);
+    List<int> right = array.sublist(mid);
+
+    return Column(
+      children: [
+        Wrap(
+          alignment: WrapAlignment.center,
+          children: array.map((value) {
+            return Container(
+              margin: EdgeInsets.all(8),
+              width: 50,
+              height: 50,
+              decoration: BoxDecoration(
+                color: level == 0 ? Colors.green : Colors.blue,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Center(
+                child: Text(
+                  value.toString(),
+                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+        SizedBox(height: 20),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 2,
+                    height: 20,
+                    color: Colors.black,
+                  ),
+                  _buildTree(left, level + 1),
+                ],
+              ),
+            ),
+            SizedBox(width: 20),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 2,
+                    height: 20,
+                    color: Colors.black,
+                  ),
+                  _buildTree(right, level + 1),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text('Merge Sort Visualization'),
-          backgroundColor: Colors.indigo,
-        ),
-        body: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              TextFormField(
-                controller: _arrayController,
-                decoration: InputDecoration(
-                  labelText: 'Enter array (comma separated)',
-                  border: OutlineInputBorder(),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Merge Sort Visualization"),
+        backgroundColor: Colors.indigo[800],
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // Input for the array
+            TextField(
+              controller: arrayController,
+              keyboardType: TextInputType.text,
+              decoration: InputDecoration(
+                labelText: "Enter array elements (comma-separated)",
+                border: OutlineInputBorder(),
+              ),
+            ),
+            SizedBox(height: 16),
+
+            // Start button
+            ElevatedButton(
+              onPressed: startMergeSort,
+              child: Text("Start Merge Sort"),
+            ),
+            SizedBox(height: 16),
+
+            // Step control buttons
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                ElevatedButton(
+                  onPressed: previousStep,
+                  child: Text("Previous Step"),
                 ),
-                keyboardType: TextInputType.text,
-                onFieldSubmitted: (value) {
-                  _parseArrayInput(value);
-                },
-              ),
-              SizedBox(height: 20),
-              Text(
-                'Array Visualization:',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 20),
-              Expanded(
-                child: Center(
-                  child: MergeSortTree(
-                    steps: _steps,
-                    currentStep: _currentStep,
-                  ),
+                ElevatedButton(
+                  onPressed: nextStep,
+                  child: Text("Next Step"),
+                ),
+              ],
+            ),
+            SizedBox(height: 20),
+
+            // Merge sort visualization with hierarchy
+            currentStep == -1
+                ? Text(
+              "Enter an array and press Start",
+              style: TextStyle(fontSize: 18),
+            )
+                : Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Text(
+                      "Step ${currentStep + 1}",
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    _buildTree(steps[currentStep], 0),
+                  ],
                 ),
               ),
-              SizedBox(height: 20),
-              Center(
-                child: ElevatedButton(
-                  onPressed: _isSorting ? null : _startSortingVisualization,
-                  child: Text('Start Sorting Animation'),
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
