@@ -237,6 +237,7 @@ for (int i = 1; i < arr.length; i++) {
                     child: Text('Auto Sort'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: _isAutoMode ? Colors.indigo : Colors.grey,
+                      foregroundColor: Colors.white,
                     ),
                   ),
                   SizedBox(width: 20),
@@ -248,6 +249,7 @@ for (int i = 1; i < arr.length; i++) {
                     child: Text('Manual Sort'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: !_isAutoMode ? Colors.indigo : Colors.grey,
+                      foregroundColor: Colors.white,
                     ),
                   ),
 
@@ -258,6 +260,7 @@ for (int i = 1; i < arr.length; i++) {
                       child: Text(_isPaused ? 'Resume' : 'Stop'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: _isPaused ? Colors.green : Colors.red,
+                        foregroundColor: Colors.white,
                       ),
                     ),
                   ],
@@ -272,11 +275,17 @@ for (int i = 1; i < arr.length; i++) {
                     ElevatedButton(
                       onPressed: _currentStep > 0 ? _previousStep : null,
                       child: Text('Previous Step'),
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: Colors.white,
+                      ),
                     ),
                     SizedBox(width: 20),
                     ElevatedButton(
                       onPressed: _currentStep < _steps.length - 1 ? _nextStep : null,
                       child: Text('Next Step'),
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: Colors.white,
+                      ),
                     ),
                   ],
                 ),

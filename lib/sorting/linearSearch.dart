@@ -224,6 +224,7 @@ class _LinearSearchPageState extends State<LinearSearchPage> {
                         child: Text('Auto Search'),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: _isAutoMode ? Colors.indigo : Colors.grey,
+                          foregroundColor: Colors.white,
                         ),
                       ),
                       SizedBox(width: 20),
@@ -239,6 +240,7 @@ class _LinearSearchPageState extends State<LinearSearchPage> {
                         child: Text('Manual Search'),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: !_isAutoMode ? Colors.indigo : Colors.grey,
+                          foregroundColor: Colors.white,
                         ),
                       ),
                     ],
@@ -252,6 +254,7 @@ class _LinearSearchPageState extends State<LinearSearchPage> {
                       child: Text(_isPaused ? 'Resume' : 'Pause'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: _isPaused ? Colors.green : Colors.red,
+                        foregroundColor: Colors.white,
                       ),
                     ),
                   ],
@@ -266,12 +269,18 @@ class _LinearSearchPageState extends State<LinearSearchPage> {
                     ElevatedButton(
                       onPressed: _currentStep > 0 ? _previousStep : null,
                       child: Text('Previous Step'),
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: Colors.white,
+                      ),
                     ),
                     SizedBox(width: 20),
                     ElevatedButton(
                       onPressed:
                       _currentStep < _steps.length - 1 ? _nextStep : null,
                       child: Text('Next Step'),
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: Colors.white,
+                      ),
                     ),
                   ],
                 ),
