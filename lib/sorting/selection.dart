@@ -2,15 +2,15 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import '../widgets/bar.dart';
 
-class SortingPage extends StatefulWidget {
+class SelectionSortPage extends StatefulWidget {
   @override
-  _SortingPageState createState() => _SortingPageState();
+  _SelectionSortPageState createState() => _SelectionSortPageState();
 }
 
-class _SortingPageState extends State<SortingPage> {
+class _SelectionSortPageState extends State<SelectionSortPage> {
   List<int> _array = [];
   List<List<int>> _steps = [];
-  List<List<int>> _swapIndices = [];
+  List<List<int>> _highlightIndices = []; // Track current and minimum indices
   bool _isSorting = false;
   bool _isPaused = false;
   int _currentStep = 0;
@@ -18,20 +18,49 @@ class _SortingPageState extends State<SortingPage> {
 
   final _arrayController = TextEditingController();
 
-  void _bubbleSort() {
+  void _selectionSort() {
     List<int> arr = List.from(_array);
-    for (int i = 0; i < arr.length - 1; i++) {
-      for (int j = 0; j < arr.length - i - 1; j++) {
-        if (arr[j] > arr[j + 1]) {
-          int temp = arr[j];
-          arr[j] = arr[j + 1];
-          arr[j + 1] = temp;
+    _steps.clear();
+    _highlightIndices.clear();
 
+    _steps.add(List.from(arr));
+    _highlightIndices.add([-1, -1]); // No highlights initially
+
+    for (int i = 0; i < arr.length - 1; i++) {
+      int minIndex = i;
+
+      // Save state at the start of outer loop
+      _steps.add(List.from(arr));
+      _highlightIndices.add([i, minIndex]); // Highlight current position and min
+
+      for (int j = i + 1; j < arr.length; j++) {
+        if (arr[j] < arr[minIndex]) {
+          minIndex = j;
+          // Save state when new minimum is found
           _steps.add(List.from(arr));
-          _swapIndices.add([j, j + 1]);
+          _highlightIndices.add([i, minIndex]);
         }
       }
+
+      // Perform swap if needed
+      if (minIndex != i) {
+        int temp = arr[i];
+        arr[i] = arr[minIndex];
+        arr[minIndex] = temp;
+
+        // Save state after swap
+        _steps.add(List.from(arr));
+        _highlightIndices.add([i, minIndex]);
+      }
+
+      // Save state after completing one pass
+      _steps.add(List.from(arr));
+      _highlightIndices.add([i, -1]); // Highlight sorted position
     }
+
+    // Add final state
+    _steps.add(List.from(arr));
+    _highlightIndices.add([-1, -1]);
   }
 
   void _parseArrayInput(String input) {
@@ -39,7 +68,7 @@ class _SortingPageState extends State<SortingPage> {
     setState(() {
       _array = array;
       _steps = [List.from(array)];
-      _swapIndices = [[-1, -1]];
+      _highlightIndices = [[-1, -1]];
       _currentStep = 0;
       _isSorting = false;
       _isPaused = false;
@@ -53,16 +82,16 @@ class _SortingPageState extends State<SortingPage> {
       _isPaused = false;
       if (!fromCurrentStep) {
         _steps = [];
-        _swapIndices = [];
+        _highlightIndices = [];
         _currentStep = 0;
-        _bubbleSort();
+        _selectionSort();
       }
     });
 
     for (int i = _currentStep; i < _steps.length; i++) {
       if (!_isAutoMode || _isPaused) break;
       await Future.delayed(Duration(milliseconds: 500));
-      if (!mounted) return; // Check if widget is still mounted
+      if (!mounted) return;
       setState(() {
         _currentStep = i;
       });
@@ -81,10 +110,10 @@ class _SortingPageState extends State<SortingPage> {
       _isPaused = false;
       _isSorting = true;
       _steps = [];
-      _swapIndices = [];
+      _highlightIndices = [];
       _currentStep = 0;
     });
-    _bubbleSort();
+    _selectionSort();
   }
 
   void _switchToAutoFromManual() {
@@ -126,7 +155,7 @@ class _SortingPageState extends State<SortingPage> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Bubble Sort Visualization'),
+          title: Text('Selection Sort Visualization'),
           backgroundColor: Colors.indigo,
         ),
         body: Padding(
@@ -148,7 +177,7 @@ class _SortingPageState extends State<SortingPage> {
               SizedBox(height: 20),
 
               Text(
-                'Bubble Sort Code:',
+                'Selection Sort Code:',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 10),
@@ -162,15 +191,16 @@ class _SortingPageState extends State<SortingPage> {
                     child: Text(
                       '''
 for (int i = 0; i < arr.length - 1; i++) {
-  for (int j = 0; j < arr.length - i - 1; j++) {
-    if (arr[j] > arr[j + 1]) {
-      int temp = arr[j];
-      arr[j] = arr[j + 1];
-      arr[j + 1] = temp;
+  int minIndex = i;
+  for (int j = i + 1; j < arr.length; j++) {
+    if (arr[j] < arr[minIndex]) {
+      minIndex = j;
     }
   }
-}
-                      ''',
+  int temp = arr[i];
+  arr[i] = arr[minIndex];
+  arr[minIndex] = temp;
+}''',
                       style: TextStyle(fontSize: 16, fontFamily: 'Courier'),
                     ),
                   ),
@@ -192,9 +222,10 @@ for (int i = 0; i < arr.length - 1; i++) {
                     int index = entry.key;
                     int value = entry.value;
 
-                    Color barColor = _swapIndices[_currentStep].contains(index)
-                        ? Colors.red
-                        : Colors.blue;
+                    Color barColor = Colors.blue;
+                    if (_highlightIndices[_currentStep].contains(index)) {
+                      barColor = Colors.red;
+                    }
 
                     return Bar(
                       value: value,
@@ -208,15 +239,15 @@ for (int i = 0; i < arr.length - 1; i++) {
 
               SizedBox(height: 20),
 
-              // Main Control Buttons
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Auto Mode Button
                   ElevatedButton(
-                    // Enable auto mode button during manual sorting
-                    onPressed: !_isSorting ? () => _startAutomaticVisualization() :
-                    _isAutoMode && !_isPaused ? null : _switchToAutoFromManual,
+                    onPressed: !_isSorting
+                        ? () => _startAutomaticVisualization()
+                        : _isAutoMode && !_isPaused
+                        ? null
+                        : _switchToAutoFromManual,
                     child: Text('Auto Sort'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: _isAutoMode ? Colors.indigo : Colors.grey,
@@ -224,16 +255,16 @@ for (int i = 0; i < arr.length - 1; i++) {
                   ),
                   SizedBox(width: 20),
 
-                  // Manual Mode Button
                   ElevatedButton(
-                    onPressed: _isSorting && _isAutoMode && !_isPaused ? null : _startManualVisualization,
+                    onPressed: _isSorting && _isAutoMode && !_isPaused
+                        ? null
+                        : _startManualVisualization,
                     child: Text('Manual Sort'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: !_isAutoMode ? Colors.indigo : Colors.grey,
                     ),
                   ),
 
-                  // Stop/Resume Button (only shown in auto mode)
                   if (_isAutoMode && _isSorting) ...[
                     SizedBox(width: 20),
                     ElevatedButton(
@@ -247,10 +278,8 @@ for (int i = 0; i < arr.length - 1; i++) {
                 ],
               ),
 
-              SizedBox(height: 10),
-
-              // Manual Control Buttons (only shown in manual mode)
               if (!_isAutoMode && _isSorting) ...[
+                SizedBox(height: 10),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -267,7 +296,6 @@ for (int i = 0; i < arr.length - 1; i++) {
                 ),
               ],
 
-              // Step Counter
               if (_isSorting) ...[
                 SizedBox(height: 10),
                 Center(
